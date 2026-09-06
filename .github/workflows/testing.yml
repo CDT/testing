@@ -1,0 +1,57 @@
+name: Course and Paper Trail tests
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: demo-store
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: demo-store/package-lock.json
+      - run: npm ci
+      - run: npm ci
+        working-directory: .
+      - run: npm run build
+        working-directory: .
+      - run: npm test
+      - run: node --test tests/integration/checkout.test.js tests/security/api.test.js tests/regression/checkout.test.js
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-report
+          path: |
+            demo-store/playwright-report/
+            demo-store/test-results/
+          retention-days: 7
+  performance:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: demo-store
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: demo-store/package-lock.json
+      - run: npm ci
+      - run: node tests/performance/load.mjs load
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: performance-report
+          path: demo-store/performance-load.json
+          retention-days: 7

@@ -4,6 +4,11 @@ import { ArrowUpRight, BookOpen, ChevronDown, ChevronLeft, ChevronRight, Check, 
 import './styles.css';
 import ChapterOne from './ChapterOne';
 import ChapterTwo from './ChapterTwo';
+import ChapterThree from './ChapterThree';
+import ChapterFour from './ChapterFour';
+import ChapterFive from './ChapterFive';
+import ChapterSix from './ChapterSix';
+import ChapterSeven from './ChapterSeven';
 
 const chapters = [
   {
@@ -32,6 +37,9 @@ const chapters = [
   },
   {
     title: 'Integration testing',
+    path: '/chapters/integration-testing/',
+    component: ChapterThree,
+    status: 'Read',
     label: 'Integration testing',
     description: 'Verify checkout services, payments, and data work together.',
     topics: [
@@ -45,6 +53,9 @@ const chapters = [
   },
   {
     title: 'End-to-end testing',
+    path: '/chapters/end-to-end-testing/',
+    component: ChapterFour,
+    status: 'Read',
     label: 'End-to-end testing',
     description: 'Exercise critical customer journeys through the store.',
     topics: [
@@ -58,8 +69,11 @@ const chapters = [
   },
   {
     title: 'Security testing',
+    path: '/chapters/security-testing/',
+    component: ChapterFive,
+    status: 'Read',
     label: 'Security testing',
-    description: 'Protect accounts, orders, payments, and administrative access.',
+    description: 'Check session isolation, trusted prices, input handling, and rendering.',
     topics: [
       'Identifying threats and setting up a safe test environment',
       'Testing authentication and sessions',
@@ -71,6 +85,9 @@ const chapters = [
   },
   {
     title: 'Performance and load testing',
+    path: '/chapters/performance-testing/',
+    component: ChapterSix,
+    status: 'Read',
     label: 'Performance and load testing',
     description: 'Measure shopping and checkout under realistic traffic.',
     topics: [
@@ -83,6 +100,9 @@ const chapters = [
   },
   {
     title: 'Regression testing',
+    path: '/chapters/regression-testing/',
+    component: ChapterSeven,
+    status: 'Read',
     label: 'Regression testing',
     description: 'Choose and maintain checks that catch unintended effects.',
     topics: [
@@ -137,7 +157,7 @@ function App() {
         <a className="mobile-demo-download" href="/downloads/paper-trail-demo.zip" download><Download size={15}/> Download demo app (ZIP)</a>
         {ChapterContent ? <><a className="lesson-next" href="/#contents">Back to course outline</a><ChapterContent/></> : <>
         <section className="intro"><div className="intro-badge"><span/> For experienced developers</div><h1>From building software<br/>to testing it deeply.</h1><p className="intro-text">A learning path from senior developer to testing specialist. Start with what testing is, why it matters, and the different types. Follow one e-commerce app through unit, integration, end-to-end, security, performance, and regression testing.</p><div className="course-meta flex flex-wrap items-center"><span><BookOpen size={15}/>{chapters.length} chapters</span><span>{count} topics · {availableCount} available</span><span>Development experience assumed</span></div></section>
-        <div className="notice flex items-start gap-3"><FlaskConical size={19} className="shrink-0 mt-0.5"/><p><strong>Chapters 01 and 02 are ready.</strong> Download Paper Trail from the sidebar and build its unit tests step by step. All testing chapters use this same demo; Chapters 03–07 are planned.</p></div>
+        <div className="notice flex items-start gap-3"><FlaskConical size={19} className="shrink-0 mt-0.5"/><p><strong>All seven chapters are ready.</strong> Download Paper Trail and build a testing suite from unit checks through integration, browser, security, performance, and regression testing. Each testing chapter includes runnable code and a ZIP download.</p></div>
         <section id="contents" className="contents"><div className="contents-heading flex items-center justify-between gap-4"><h2>Table of contents</h2><button className="expand-button" onClick={() => setOpen(open.size === chapters.length ? new Set() : new Set(chapters.map((_, index) => index)))}>{open.size === chapters.length ? 'Collapse all' : 'Expand all'}<ChevronDown size={14} className={open.size === chapters.length ? 'rotated' : ''}/></button></div>
           <div className="search-wrap"><Search size={17}/><input aria-label="Search the course outline" value={query} onChange={event => setQuery(event.target.value)} placeholder="Find a topic..."/>{query && <button aria-label="Clear search" onClick={() => setQuery('')}><X size={16}/></button>}<span className="search-hint">Explore the outline</span></div>
           <div className="chapter-list">{filtered.map(chapter => { const expanded = open.has(chapter.index) || Boolean(query.trim()); return <article className={`chapter ${expanded ? 'is-open' : ''}`} id={`chapter-${chapter.index}`} key={chapter.index}><h3><button className="chapter-toggle" onClick={() => toggle(chapter.index)} aria-expanded={expanded} aria-controls={`topics-${chapter.index}`}><span className="chapter-number">{String(chapter.index + 1).padStart(2, '0')}</span><span className="chapter-text"><span className="chapter-title">{chapter.title}</span><span className="chapter-description">{chapter.description}</span></span><span className="topic-count">{chapter.topics.length ? `${chapter.topics.length} topics` : 'TBD'}</span><ChevronDown size={17} className={`chapter-chevron ${expanded ? 'rotated' : ''}`}/></button></h3>{expanded && chapter.topics.length > 0 && <ol className="topics" id={`topics-${chapter.index}`}>{chapter.topics.map((topic, index) => <li key={topic}><span className="topic-number">{chapter.index + 1}.{index + 1}</span>{chapter.path ? <a className="topic-link" href={`${chapter.path}#lesson-${chapter.index + 1}-${index + 1}`}>{topic}</a> : <span className="topic-link">{topic}</span>}<span className="planned">{chapter.status || 'Planned'}</span></li>)}</ol>}</article>; })}{filtered.length === 0 && <div className="empty"><Search size={24}/><h3>No topics found</h3><p>Try a broader term, like “bugs”, “web”, or “testing”.</p><button onClick={() => setQuery('')}>Show all chapters</button></div>}</div>

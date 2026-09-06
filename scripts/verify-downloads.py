@@ -50,4 +50,38 @@ with ZipFile(downloads / 'chapter-02-unit-tests.zip') as bundle:
 
 command(['node', '--test', 'tests/unit/coupons.test.js'])
 print('Individual coupon file: passed', flush=True)
+
+for number, slug, api_files, expected_api, browser_count in [
+    ('03', 'integration', ['integration/checkout.test.js'], 6, 0),
+    ('04', 'e2e', ['integration/checkout.test.js'], 6, 5),
+    ('05', 'security', ['integration/checkout.test.js', 'security/api.test.js'], 13, 6),
+    ('06', 'performance', ['integration/checkout.test.js', 'security/api.test.js'], 13, 0),
+    ('07', 'regression', ['integration/checkout.test.js', 'security/api.test.js', 'regression/checkout.test.js'], 16, 6),
+]:
+    with ZipFile(downloads / f'chapter-{number}-{slug}-tests.zip') as bundle:
+        names = bundle.namelist()
+        assert not any('node_modules/' in name or 'dist/' in name for name in names)
+        assert all(name in names for name in ['tests/unit/shipping.test.js', 'tests/unit/pricing.test.js', 'tests/unit/boundaries.test.js', 'tests/unit/coupons.test.js'])
+        if number == '04':
+            assert 'tests/e2e/security.spec.js' not in names
+        for name in names:
+            if name.startswith('tests/') or name == 'playwright.config.js':
+                assert bundle.read(name) == (root / 'demo-store' / name).read_bytes(), name
+        bundle.extractall(app)
+    output = command([npm, 'test'])
+    assert re.search(r'\btests 28\b', output) and re.search(r'\bfail 0\b', output), output
+    output = command(['node', '--test', *['tests/' + name for name in api_files]])
+    assert re.search(r'\btests ' + str(expected_api) + r'\b', output) and re.search(r'\bfail 0\b', output), output
+    print(f'Chapter {number}: 28 unit + {expected_api} API tests passed', flush=True)
+    if number == '04':
+        command([npm, 'exec', '--', 'playwright', 'install', 'chromium'])
+    if browser_count:
+        output = command([npm, 'exec', '--', 'playwright', 'test'])
+        assert re.search(r'\b' + str(browser_count) + r' passed\b', output), output
+        print(f'Chapter {number}: {browser_count} browser tests passed', flush=True)
+    if number == '06':
+        command(['node', 'tests/performance/load.mjs', 'baseline'])
+        print('Chapter 06: packaged baseline load profile passed', flush=True)
+command([npm, 'exec', '--', 'playwright', 'test', '--grep', '@smoke'])
+print('Packaged smoke suite: passed', flush=True)
 print(f'Verified extracted app retained at {app}', flush=True)

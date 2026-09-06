@@ -61,6 +61,22 @@ Use Node's built-in `node:test` and `node:assert/strict`; no test dependency is 
 3. `boundaries.test.js`: 13 more tests; `npm test` now runs 21.
 4. `coupons.test.js`: 7 more tests; `npm test` now runs 28.
 
-`npm test` / `npm run test:unit` use `node --test` auto-discovery. Before adding files, zero tests are expected and are not evidence of coverage. Tests use the `.test.js` naming convention. A passing suite ends with 28 tests, 28 pass, 0 fail. It imports production modules and needs neither Vite nor the HTTP server running.
+`npm test` / `npm run test:unit` use `scripts/run-checks.mjs` to select only unit files for Node’s built-in runner. Before adding files, zero tests are expected and are not evidence of coverage. Tests use the `.test.js` naming convention. A passing suite ends with 28 tests, 28 pass, 0 fail. It imports production modules and needs neither Vite nor the HTTP server running.
 
-For the completed download, copy its `tests` folder into this app root (beside `src` and `package.json`), then run `npm test`. Do not replace production modules or create a second nested demo-store folder. Later chapter test downloads will state their prerequisites and build on this baseline.
+For the completed download, copy its `tests` folder into this app root (beside `src` and `package.json`), then run `npm test`. Do not replace production modules or create a second nested demo-store folder. Later chapter downloads include cumulative tests and state their prerequisites; keep using this app.
+
+## Chapters 03–07
+
+The starter includes pinned @playwright/test 1.63.0 but no test files. Add the maintained solutions in chapter order. Later ZIPs include earlier tests and supporting config; merge into this folder.
+
+- Chapter 03: `node --test tests/integration/checkout.test.js` — 6 real HTTP cases; fixture in `tests/helpers/api.js`.
+- Chapter 04: add `playwright.config.js` and `tests/e2e/store.spec.js`; run `npx playwright install chromium`, then `npx playwright test` — 5 browser cases. The runner builds and starts this app on port 5175; leave it free.
+- Chapter 05: `node --test tests/security/api.test.js` — 7 API cases. Add `tests/e2e/security.spec.js`; the browser suite now has 6 cases.
+- Chapter 06: `node tests/performance/load.mjs baseline` (also load, spike, soak) — bounded loopback workload with JSON reports and a local p95 budget. No external load service is contacted.
+- Chapter 07: `node --test tests/regression/checkout.test.js` — 3 regression cases. The included `.github/workflows/testing.yml` assumes this app is the repository root.
+
+After all chapters, `npm run test:api` selects all 44 deterministic cases; `npm run test:e2e` runs 6 browser cases; `npm run test:smoke` selects 2. These aliases select existing files, so missing chapter files are not evidence of coverage: check the expected counts. Do not use bare `node --test` once browser specs exist. Node suites use `.test.js`, Playwright uses `.spec.js`, and performance uses `.mjs`.
+
+The browser configuration uses fresh contexts, one worker, zero retries, and fresh server state per invocation. Inventory is shared within a run. Reports/traces are generated in playwright-report and test-results; do not package these. `npx playwright show-report` opens the report.
+
+Security checks document current session and validation behavior; they do not add login, HTTPS, session expiry, rate limits, or real payment verification. The load harness runs the real API in a separate local process but shares host resources with its generator. Its 500 ms per-endpoint p95 budget is an exercise threshold, not a production SLO.

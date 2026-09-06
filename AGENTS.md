@@ -5,10 +5,10 @@
 Testing Notes is a software testing course site built with React 19, Vite 7, and Tailwind CSS 4.
 
 - `src/main.jsx` contains the shared layout, course outline, search, navigation, and theme state.
-- `src/ChapterOne.jsx` contains the introductory lessons; `src/styles.css` holds shared styles and responsive/theme rules.
-- `index.html` and `chapters/software-testing/index.html` are separate page entry points, both loading `src/main.jsx`.
+- `src/ChapterOne.jsx` through `src/ChapterSeven.jsx` contain the lessons. `src/LessonParts.jsx` provides shared sections and raw source snippets; `src/styles.css` holds shared styles and responsive/theme rules.
+- `index.html` and all seven `chapters/*/index.html` files are separate page entry points loading `src/main.jsx`.
 - `vite.config.js` registers production entry points and the Tailwind plugin.
-- `dist/` is generated output; `node_modules/` contains installed dependencies. Both are ignored by Git. There are no dedicated test or asset directories.
+- `dist/` is generated output; `node_modules/` contains installed dependencies. Both are ignored by Git. Maintained demo tests live in `demo-store/tests/`; chapter download instructions live in `course/`.
 
 ## Build, Test, and Development Commands
 
@@ -23,7 +23,9 @@ Use JavaScript ES modules and functional React components. Follow existing two-s
 
 ## Testing Guidelines
 
-No automated test framework, test script, or coverage threshold is configured. For application changes, run `npm run build`, then check the preview at `/` and `/chapters/software-testing/`. Verify direct navigation, refreshes, lesson anchors, search and clearing, chapter expansion, theme persistence, and mobile layouts. Check keyboard access and accessible labels when modifying controls. If introducing automated tests, document the runner, naming convention, and command.
+The course UI has no automated test framework or coverage threshold. For application changes, run `npm run build`, then check the preview at `/` and the chapter routes. Verify direct navigation, refreshes, lesson anchors, search and clearing, chapter expansion, theme persistence, and mobile layouts. Check keyboard access and accessible labels when modifying controls.
+
+Demo Node suites use `tests/{unit,integration,security,regression}/*.test.js`; run `npm run test:api` for all 44 cases. Playwright uses `tests/e2e/*.spec.js`; install Chromium with `npx playwright install chromium`, then run `npm run test:e2e` for 6 cases or `npm run test:smoke` for 2. It builds and manages the real demo server on port 5175, which must be free. Run `node tests/performance/load.mjs baseline` (or load, spike, soak) separately; its latency budgets depend on the host. Keep reports and traces out of archives.
 
 ## Commit & Pull Request Guidelines
 

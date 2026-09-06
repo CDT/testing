@@ -1,56 +1,62 @@
 # Testing Notes
 
-A software testing course for experienced developers, built with Vite, React, and Tailwind CSS. Chapter 01 introduces testing; Chapter 02 builds 28 unit tests step by step against Paper Trail, the runnable e-commerce demo in `demo-store/`. Five further chapters are planned. Every testing chapter uses the same demo, adds tests gradually, and ends with a test-code download.
+A seven-chapter software testing course built with React, Vite, and Tailwind. All 37 topics are implemented. Chapters 02–07 build on Paper Trail, the runnable Node.js + React store in `demo-store/`.
 
-## Development
+## Course development
 
 ```sh
-npm install
+npm ci
 npm run dev
-```
-
-## Production build
-
-```sh
 npm run build
 npm run preview
 ```
 
-The home page contains the course outline. Standalone chapters are at `/chapters/software-testing/` and `/chapters/unit-testing/`, with stable lesson anchors. All three pages are emitted by the production build, so direct links and refreshes do not require an SPA fallback. The shared sidebar links to the demo ZIP; mobile pages show the same download above the main content.
+The production build emits the home page and all seven standalone entries under `/chapters/`: `software-testing`, `unit-testing`, `integration-testing`, `end-to-end-testing`, `security-testing`, `performance-testing`, and `regression-testing`. Each preserves `lesson-N-M` anchors and supports direct navigation and refresh.
 
-## Run the demo
+`src/ChapterOne.jsx` through `src/ChapterSeven.jsx` contain the lessons. `src/LessonParts.jsx` renders shared sections and imports maintained test/configuration files as raw text, so the displayed code and downloads stay aligned. `src/main.jsx` owns navigation, search, and themes.
 
-Use Node.js 22.12 or newer:
+## Demo and test commands
+
+Use Node.js 22.12+ and run these from `demo-store`:
 
 ```sh
-cd demo-store
 npm ci
 npm run dev
 ```
 
-Open http://localhost:5174. The Node server serves the API and Vite middleware together. For production mode, run `npm run build` then `npm start` from the same folder. See `demo-store/README.md` for business rules and limitations: payments are simulated; sessions, stock, and orders live in memory and reset on server restart.
+Open http://localhost:5174. For production mode, run `npm run build` then `npm start`. Payments are simulated. Sessions, stock, orders, and retry IDs live in memory and reset on server restart. Accounts, durable storage, admin roles, and provider callbacks are not implemented.
 
-## Unit tests and downloads
+```sh
+npm test                     # 28 unit cases
+npm run test:integration     # 6 real HTTP integration cases
+npm run test:security        # 7 API security cases
+npm run test:regression      # 3 regression cases
+npm run test:api             # all 44 deterministic cases
+npx playwright install chromium
+npm run test:e2e             # 6 browser cases; builds and starts the app
+npm run test:smoke           # 2 tagged browser cases
+npm run test:performance -- baseline
+```
 
-The maintained solutions are `demo-store/tests/unit/*.test.js`. Run `npm test` inside `demo-store` (Node's built-in runner); expect 28 passing tests. The starter ZIP excludes tests so learners can add them progressively. Chapter 02 imports the same test source as raw text to keep its snippets aligned with the downloadable solution.
+Node suites use `tests/{unit,integration,security,regression}/*.test.js`. The explicit file-discovery script keeps `npm test` scoped to the 28-unit baseline. Playwright uses `tests/e2e/*.spec.js`, a fresh built server on port 5175, one worker, and no retries. Leave that port free. Run `npx playwright show-report` to inspect results and failure traces.
 
-From the course root, rebuild the ZIPs after changing demo source or tests (Python 3, standard library only):
+Performance profiles are `baseline`, `load`, `spike`, and `soak`. They write ignored `performance-PROFILE.json` files and check per-endpoint p95 below the local exercise budget of 500 ms with zero unexpected errors. They are bounded loopback experiments, not production capacity claims.
+
+## Downloads and verification
+
+Run from the course root:
 
 ```sh
 python scripts/package-downloads.py
+python scripts/verify-downloads.py
+node scripts/verify-demo-api.mjs
 npm run build
 ```
 
-- `public/downloads/paper-trail-demo.zip`: source, lockfile, README; no tests, node_modules, or dist.
-- `public/downloads/chapter-02-unit-tests.zip`: four test files under `tests/unit/` plus extraction instructions from `course/unit-testing/README.md`.
+The sidebar starter ZIP includes source and locked dependencies, but omits tests, browser configuration, workflows, generated reports, node_modules, and dist. Chapter 02 includes its four unit files. Chapters 03–07 provide cumulative test-code ZIPs with prerequisites and commands in `course/{integration,e2e,security,performance,regression}/README.md`. Extract solutions into the existing demo app; do not replace application source.
 
-Maintainer verification, from the course root:
+The verifier installs and builds a freshly extracted starter, checks incremental unit counts and the intentional shipping defect/fix, applies every cumulative solution, verifies its raw source, runs each applicable suite, and checks the smoke tests and baseline load profile. It prints the retained temporary directory. Browser verification requires Chromium; the verifier installs it if needed.
 
-```sh
-python scripts/verify-downloads.py
-node scripts/verify-demo-api.mjs
-```
+The root `.github/workflows/testing.yml` builds the course and checks the nested demo on pushes and pull requests. The Chapter 07 workflow under `demo-store/.github/` is for learners whose extracted app is a standalone repository. Performance runs only on manual workflow dispatch. Neither workflow deploys.
 
-Download verification extracts a fresh starter in a temporary directory, runs `npm ci` and a production build, adds tests in chapter order (2 → 8 → 21 → 28), verifies the intentional shipping defect (20 pass / 1 fail), restores it, and verifies the fix. The temporary app is retained for inspection; its location is printed. API verification uses an isolated ephemeral server to check pricing, validation, declined payments, order creation, retry idempotency, session isolation, and inventory competition.
-
-For each later chapter, state the existing app/test prerequisites, exact files to create or edit, commands to run, expected results, and a final test-code ZIP. Keep completed unit tests as the baseline and label any simulated integrations accurately.
+For UI changes, also inspect direct chapter links, anchors, search/clearing, expansion, theme persistence, keyboard access, and mobile layouts in the production preview. Rebuild downloads whenever maintained test or demo source changes.

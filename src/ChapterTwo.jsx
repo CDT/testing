@@ -60,7 +60,7 @@ npm run dev`}</Code>
       <p><strong>Arrange</strong> establishes the input, <strong>act</strong> calls production code, and <strong>assert</strong> compares its result with an independently known amount. The import goes up two folders from <code>tests/unit</code> to the app root, then into <code>src/domain</code>.</p>
       <h3>Step 5. Run the two tests</h3>
       <Code>node --test tests/unit/shipping.test.js</Code>
-      <p>Expected: <strong>2 tests, 2 pass, 0 fail.</strong> The existing <code>npm test</code> command also discovers <code>*.test.js</code> files. Before adding files, a zero-test run is not evidence of coverage.</p>
+      <p>Expected: <strong>2 tests, 2 pass, 0 fail.</strong> The existing <code>npm test</code> command selects <code>tests/unit/*.test.js</code> files through <code>scripts/run-checks.mjs</code>. Before adding files, a zero-test run is not evidence of coverage.</p>
       <p>Temporarily change the first expected value from 599 to 600 and rerun. The failure should show actual 599 versus expected 600. Restore 599. This confirms the assertion executes, not that the suite covers every shipping case.</p>
       <p>A “module not found” error is a setup problem: check paths and filenames. An assertion mismatch requires investigating the requirement, input, and implementation. Do not change an expectation merely to get a passing result.</p>
       <p className="lesson-source">API references: <a href="https://nodejs.org/api/test.html" target="_blank" rel="noreferrer">Node.js test runner</a> and <a href="https://nodejs.org/api/assert.html" target="_blank" rel="noreferrer">strict assertions</a>.</p>
@@ -133,7 +133,7 @@ npm test`}</Code>
       <p><a className="lesson-download" href="/downloads/chapter-02-unit-tests.zip" download>Download Chapter 02 test code (ZIP)</a></p>
       <p>Extract the ZIP and copy its <code>tests</code> folder into your existing <code>demo-store</code> folder, beside <code>src</code> and <code>package.json</code>. If you followed the chapter, compare the files or replace your test files with these. The archive contains tests and a README, not another app. Restore <code>&gt;=</code> if you left the temporary defect in place, then run <code>npm test</code>.</p>
       <p><strong>Carry this forward:</strong> retain the suite. Each later testing chapter will specify the next files to add and provide its test-code download at the end.</p>
-      <a className="lesson-next" href="/#chapter-2">View the integration testing outline</a>
+      <a className="lesson-next" href="/chapters/integration-testing/">Continue to integration testing</a>
     </section>
   </article>;
 }
