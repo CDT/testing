@@ -1,4 +1,5 @@
 import React from 'react';
+import Code from './Code';
 
 function Comparison({ headings, rows }) {
   return <div className="lesson-table"><table><thead><tr>{headings.map(h => <th key={h} scope="col">{h}</th>)}</tr></thead><tbody>{rows.map(([name, ...cells]) => <tr key={name}><th scope="row">{name}</th>{cells.map(cell => <td key={cell}>{cell}</td>)}</tr>)}</tbody></table></div>;
@@ -14,9 +15,9 @@ export default function ChapterOne() {
       <p>As a developer, you already know how to make a feature work. In testing, expand the question: under which conditions does it work, how could it fail, and what evidence would convince us?</p>
       <h3>Example: free shipping at $100</h3>
       <p>Suppose the agreed rule is: “Free shipping applies when the merchandise subtotal after discounts is at least $100, before tax.” Otherwise, shipping costs $5.99. The implementation below uses integer cents.</p>
-      <pre><code>{`function shippingCost(subtotalAfterDiscountCents) {
+      <Code>{`function shippingCost(subtotalAfterDiscountCents) {
   return subtotalAfterDiscountCents > 10000 ? 0 : 599;
-}`}</code></pre>
+}`}</Code>
       <p>A $120 order gets free shipping. A $60 order does not. Both checks pass, but they miss the exact threshold.</p>
       <figure className="lesson-illustration">
         <img src="/illustrations/chapter-one-shipping-boundary.webp" width="1536" height="1024" loading="lazy" decoding="async" alt="Three shopping carts compare shipping at $99.99, $100.00, and $100.01. The cases below and above the threshold pass. Exactly $100.00 fails: shipping should be free, but the code charges $5.99." />

@@ -1,12 +1,9 @@
 import React from 'react';
+import Code from './Code';
 import shippingTests from '../demo-store/tests/unit/shipping.test.js?raw';
 import pricingTests from '../demo-store/tests/unit/pricing.test.js?raw';
 import boundaryTests from '../demo-store/tests/unit/boundaries.test.js?raw';
 import couponTests from '../demo-store/tests/unit/coupons.test.js?raw';
-
-function Code({ children }) {
-  return <pre><code>{children}</code></pre>;
-}
 
 export default function ChapterTwo() {
   return <article className="lesson" aria-label="Chapter 02: Unit testing">

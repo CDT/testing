@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { ArrowUpRight, BookOpen, ChevronDown, Check, FlaskConical, Moon, Sun, Search, X, Download } from 'lucide-react';
+import { ArrowUpRight, BookOpen, ChevronDown, ChevronLeft, ChevronRight, Check, FlaskConical, Moon, Sun, Search, X, Download } from 'lucide-react';
 import './styles.css';
 import ChapterOne from './ChapterOne';
 import ChapterTwo from './ChapterTwo';
@@ -117,17 +117,21 @@ function App() {
   }, [theme]);
   const [open, setOpen] = useState(new Set([0]));
   const [query, setQuery] = useState('');
+  const [tocOpen, setTocOpen] = useState(() => window.matchMedia('(min-width: 1101px)').matches);
   useEffect(() => {
     if (window.location.hash) {
       document.getElementById(window.location.hash.slice(1))?.scrollIntoView();
     }
   }, []);
   const filtered = chapters.map((chapter, index) => ({ ...chapter, index })).filter(chapter => `${chapter.title} ${chapter.description} ${chapter.topics.join(' ')}`.toLowerCase().includes(query.toLowerCase().trim()));
+  const tocItems = ChapterContent
+    ? chapters[activeChapterIndex].topics.map((title, index) => ({ title, id: `lesson-${activeChapterIndex + 1}-${index + 1}` }))
+    : [{ title: 'Course outline', id: 'contents' }, ...filtered.map(chapter => ({ title: chapter.title, id: `chapter-${chapter.index}` }))];
   function toggle(index) { setOpen(previous => { const next = new Set(previous); next.has(index) ? next.delete(index) : next.add(index); return next; }); }
 
   return <div className="min-h-screen">
     <header className="site-header"><div className="header-inner flex items-center justify-between"><a href="/" className="brand flex items-center gap-2.5" aria-label="Testing Notes home"><span className="brand-mark"><Check size={19} strokeWidth={2.8}/></span>testing<span className="brand-light">notes</span><span className="small-tag">a learning guide</span></a><div className="header-actions"><a className="header-link flex items-center gap-2" href="/#contents">Course outline <ArrowUpRight size={15}/></a><button type="button" className="theme-toggle" onClick={() => setTheme(current => current === 'light' ? 'dark' : 'light')} aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`} title={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}>{theme === 'light' ? <Moon size={17}/> : <Sun size={17}/>}</button></div></div></header>
-    <div className="page-shell">
+    <div className={`page-shell ${tocOpen ? '' : 'toc-collapsed'}`}>
       <aside className="sidebar"><div className="sidebar-sticky"><div className="sidebar-title flex items-center gap-2"><BookOpen size={16}/> The learning path</div><nav aria-label="Chapters">{chapters.map((chapter, index) => <a key={index} href={chapter.path || `/#chapter-${index}`} aria-current={index === activeChapterIndex ? 'page' : undefined} className={`nav-item ${index === activeChapterIndex ? 'active' : ''}`}><span className="nav-number">{String(index + 1).padStart(2, '0')}</span>{chapter.label}</a>)}</nav><a className="sidebar-download" href="/downloads/paper-trail-demo.zip" download><Download size={16}/><span>Download demo app<small>Paper Trail · Node + React · ZIP</small></span></a><div className="sidebar-note"><span className="note-dot"/> Build on your experience.<br/><span className="note-indent">Develop testing judgment.</span></div></div></aside>
       <main>
         <a className="mobile-demo-download" href="/downloads/paper-trail-demo.zip" download><Download size={15}/> Download demo app (ZIP)</a>
@@ -141,6 +145,16 @@ function App() {
         </>}
         <footer className="flex flex-wrap items-center justify-between gap-3"><span>Engineering experience. Testing judgment.</span><span>Built for the curious <span className="footer-spark">✳</span></span></footer>
       </main>
+      <aside className="page-toc" aria-label="Current page contents">
+        <div className="page-toc-sticky">
+          <button type="button" className="page-toc-toggle" aria-label={tocOpen ? 'Collapse table of contents' : 'Expand table of contents'} aria-expanded={tocOpen} aria-controls="page-toc-links" onClick={() => setTocOpen(previous => !previous)}>
+            <span>On this page</span>{tocOpen ? <ChevronRight size={16}/> : <ChevronLeft size={16}/>}
+          </button>
+          <nav id="page-toc-links" aria-label="On this page" hidden={!tocOpen}>
+            <ol>{tocItems.map(item => <li key={item.id}><a href={`#${item.id}`}>{item.title}</a></li>)}</ol>
+          </nav>
+        </div>
+      </aside>
     </div>
   </div>;
 }
